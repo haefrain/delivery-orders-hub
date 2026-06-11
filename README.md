@@ -53,7 +53,7 @@ pnpm test
 - [x] **M2** — Canonical order model + order state machine
 - [x] **M3** — Provider webhooks with HMAC signature verification
 - [x] **M4** — Provider adapters + BullMQ worker pipeline
-- [ ] **M5** — Idempotency + dead-letter queue with visibility endpoints
+- [x] **M5** — Idempotency + dead-letter queue with visibility endpoints
 - [ ] **M6** — Orders API + operator transitions
 - [ ] **M7** — Real-time kanban dashboard
 - [ ] **M8** — Traffic simulator, full e2e suite, architecture docs & demo GIF
