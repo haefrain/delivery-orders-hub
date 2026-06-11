@@ -8,8 +8,10 @@
     "build": "nest build",
     "start": "nest start",
     "start:dev": "nest start --watch",
+    "start:worker": "node dist/worker.main.js",
     "typecheck": "tsc --noEmit",
-    "test": "jest"
+    "test": "jest",
+    "test:integration": "jest -c jest.integration.config.js --runInBand"
   },
   "dependencies": {
     "@delivery-hub/shared": "workspace:*",
