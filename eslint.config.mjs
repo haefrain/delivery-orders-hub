@@ -26,5 +26,11 @@ export default tseslint.config(
       globals: globals.node,
     },
   },
+  {
+    files: ['apps/web/**/*.{ts,vue}'],
+    languageOptions: {
+      globals: globals.browser,
+    },
+  },
   prettier,
 );

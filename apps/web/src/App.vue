@@ -1,24 +1,32 @@
 <script setup lang="ts">
-const providers = ['Rappi', 'Uber Eats', 'DiDi Food'];
+import { onMounted } from 'vue';
+
+import DlqIndicator from './components/DlqIndicator.vue';
+import KanbanBoard from './components/KanbanBoard.vue';
+import MetricsBar from './components/MetricsBar.vue';
+import { useRealtimeOrders } from './composables/useRealtimeOrders';
+import { useOrdersStore } from './stores/orders.store';
+
+const store = useOrdersStore();
+useRealtimeOrders();
+
+onMounted(() => {
+  void store.load();
+});
 </script>
 
 <template>
   <div class="min-h-screen bg-slate-950 text-slate-100">
-    <header class="border-b border-slate-800 px-6 py-4">
-      <h1 class="text-xl font-semibold">Delivery Orders Hub</h1>
-      <p class="text-sm text-slate-400">Unified real-time view of incoming delivery orders</p>
+    <header class="flex items-center justify-between border-b border-slate-800 px-6 py-4">
+      <div>
+        <h1 class="text-xl font-semibold">Delivery Orders Hub</h1>
+        <p class="text-sm text-slate-400">Rappi · Uber Eats · DiDi Food — one live board</p>
+      </div>
+      <DlqIndicator />
     </header>
-    <main class="p-6">
-      <ul class="flex gap-2">
-        <li
-          v-for="provider in providers"
-          :key="provider"
-          class="rounded-full bg-slate-800 px-3 py-1 text-sm"
-        >
-          {{ provider }}
-        </li>
-      </ul>
-      <p class="mt-6 text-slate-500">Live kanban board coming in upcoming milestones.</p>
+    <main class="space-y-4 p-6">
+      <MetricsBar />
+      <KanbanBoard />
     </main>
   </div>
 </template>

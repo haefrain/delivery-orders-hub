@@ -12,6 +12,9 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@delivery-hub/shared": "workspace:*",
+    "pinia": "^3.0.4",
+    "socket.io-client": "^4.8.3",
     "vue": "^3.5.0"
   },
   "devDependencies": {
