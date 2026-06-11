@@ -9,8 +9,14 @@ import { Server } from 'socket.io';
  * Relay, not a brain: subscribes to the Redis domain-events channel and
  * fans out to every connected dashboard. A dedicated connection is required
  * because a Redis connection in subscribe mode can't issue other commands.
+ *
+ * CORS is restricted to the dashboard origin (browsers only send Origin on
+ * cross-origin connects; the Vite proxy setup is same-origin and unaffected).
+ * Handshake auth is an explicit non-goal of this demo (see Out of scope).
  */
-@WebSocketGateway({ cors: { origin: '*' } })
+@WebSocketGateway({
+  cors: { origin: process.env.DASHBOARD_ORIGIN ?? 'http://localhost:5173' },
+})
 export class OrdersGateway implements OnModuleInit, OnModuleDestroy {
   @WebSocketServer()
   server!: Server;
