@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 
 import { PrismaModule } from '../prisma/prisma.module';
 import { ProvidersModule } from '../providers/providers.module';
-import { INGEST_QUEUE } from '../queue/queue.constants';
+import { INGEST_DLQ_QUEUE, INGEST_QUEUE } from '../queue/queue.constants';
 import { IngestProcessor } from './ingest.processor';
 
 /**
@@ -14,7 +14,11 @@ import { IngestProcessor } from './ingest.processor';
  * classes whose queue is registered in the same module.
  */
 @Module({
-  imports: [PrismaModule, ProvidersModule, BullModule.registerQueue({ name: INGEST_QUEUE })],
+  imports: [
+    PrismaModule,
+    ProvidersModule,
+    BullModule.registerQueue({ name: INGEST_QUEUE }, { name: INGEST_DLQ_QUEUE }),
+  ],
   providers: [IngestProcessor],
 })
 export class ProcessingModule {}

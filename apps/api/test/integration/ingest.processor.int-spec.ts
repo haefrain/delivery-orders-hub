@@ -1,4 +1,5 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from '@jest/globals';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { getQueueToken } from '@nestjs/bullmq';
 import { Test } from '@nestjs/testing';
 import { OrderStatus, Provider } from '@delivery-hub/shared';
 import { Prisma } from '@prisma/client';
@@ -8,6 +9,7 @@ import { IngestJobData, IngestProcessor } from '../../src/ingestion/ingest.proce
 import { PrismaModule } from '../../src/prisma/prisma.module';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { ProvidersModule } from '../../src/providers/providers.module';
+import { INGEST_DLQ_QUEUE } from '../../src/queue/queue.constants';
 import didiFixture from '../fixtures/didi-order-created.json';
 import rappiFixture from '../fixtures/rappi-order-created.json';
 
@@ -20,7 +22,10 @@ describe('IngestProcessor (integration, real Postgres)', () => {
     // BullMQ delivery mechanics are not what these tests verify.
     const moduleRef = await Test.createTestingModule({
       imports: [PrismaModule, ProvidersModule],
-      providers: [IngestProcessor],
+      providers: [
+        IngestProcessor,
+        { provide: getQueueToken(INGEST_DLQ_QUEUE), useValue: { add: jest.fn() } },
+      ],
     }).compile();
 
     processor = moduleRef.get(IngestProcessor);

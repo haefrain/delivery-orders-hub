@@ -31,16 +31,28 @@ export class IngestionService {
     // order id) lives in the Order unique constraint.
     const externalEventId = createHash('sha256').update(rawBody).digest('hex');
 
-    const delivery = await this.prisma.webhookDelivery.create({
-      data: {
-        provider,
-        externalEventId,
-        payload: payload as Prisma.InputJsonValue,
-      },
-    });
+    try {
+      const delivery = await this.prisma.webhookDelivery.create({
+        data: {
+          provider,
+          externalEventId,
+          payload: payload as Prisma.InputJsonValue,
+        },
+      });
 
-    await this.ingestQueue.add(INGEST_JOB, { deliveryId: delivery.id }, { jobId: delivery.id });
+      await this.ingestQueue.add(INGEST_JOB, { deliveryId: delivery.id }, { jobId: delivery.id });
 
-    return { deliveryId: delivery.id };
+      return { deliveryId: delivery.id };
+    } catch (error) {
+      // P2002 on the unique constraint = the provider retried an event we
+      // already have. Ack with the original id; nothing new is queued.
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        const existing = await this.prisma.webhookDelivery.findUniqueOrThrow({
+          where: { provider_externalEventId: { provider, externalEventId } },
+        });
+        return { deliveryId: existing.id };
+      }
+      throw error;
+    }
   }
 }
