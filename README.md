@@ -50,7 +50,7 @@ pnpm test
 ## Roadmap
 
 - [x] **M1** — Monorepo skeleton, tooling, CI pipeline
-- [ ] **M2** — Canonical order model + order state machine
+- [x] **M2** — Canonical order model + order state machine
 - [ ] **M3** — Provider webhooks with HMAC signature verification
 - [ ] **M4** — Provider adapters + BullMQ worker pipeline
 - [ ] **M5** — Idempotency + dead-letter queue with visibility endpoints
