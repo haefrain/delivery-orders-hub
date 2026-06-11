@@ -17,3 +17,6 @@ export const OrderStatus = {
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
 
 export const ALL_ORDER_STATUSES: readonly OrderStatus[] = Object.values(OrderStatus);
+
+export const isOrderStatus = (value: unknown): value is OrderStatus =>
+  typeof value === 'string' && (ALL_ORDER_STATUSES as string[]).includes(value);
