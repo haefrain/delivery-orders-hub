@@ -6,7 +6,8 @@ services:
       POSTGRES_PASSWORD: hub
       POSTGRES_DB: delivery_hub
     ports:
-      - '5432:5432'
+      # 5433 on the host: macOS dev machines often run a native postgres on 5432
+      - '5433:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:

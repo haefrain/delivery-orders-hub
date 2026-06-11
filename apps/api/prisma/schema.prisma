@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Provider {
+  RAPPI
+  UBEREATS
+  DIDI
+}
+
+enum OrderStatus {
+  RECEIVED
+  ACCEPTED
+  IN_PREPARATION
+  READY
+  DISPATCHED
+  DELIVERED
+  CANCELLED
+  REJECTED
+}
+
+enum DeliveryStatus {
+  RECEIVED
+  PROCESSED
+  FAILED
+  DEAD
+}
+
+model Order {
+  id           String      @id @default(uuid())
+  provider     Provider
+  /// Order id in the provider's own system
+  externalId   String
+  status       OrderStatus @default(RECEIVED)
+  customerName String
+  /// [{ name, quantity, unitPriceCents }] — kept as JSON on purpose (ADR 0002)
+  items        Json
+  /// Money is integer minor units; never floats or decimals (ADR 0002)
+  totalCents   Int
+  currency     String
+  placedAt     DateTime
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  events OrderEvent[]
+
+  // Creation idempotency lives in the database, not in application checks
+  @@unique([provider, externalId])
+  @@index([status])
+}
+
+/// Audit trail of lifecycle transitions — NOT event sourcing
+model OrderEvent {
+  id         String       @id @default(uuid())
+  orderId    String
+  order      Order        @relation(fields: [orderId], references: [id])
+  fromStatus OrderStatus?
+  toStatus   OrderStatus
+  /// "webhook" | "operator" | "simulator"
+  actor      String
+  createdAt  DateTime     @default(now())
+
+  @@index([orderId, createdAt])
+}
+
+/// Raw inbound webhook + idempotency anchor: what arrived, separate from what it means
+model WebhookDelivery {
+  id              String         @id @default(uuid())
+  provider        Provider
+  externalEventId String
+  payload         Json
+  status          DeliveryStatus @default(RECEIVED)
+  error           String?
+  receivedAt      DateTime       @default(now())
+  processedAt     DateTime?
+
+  // A provider retrying the same event hits P2002 and is acked as already-processed
+  @@unique([provider, externalEventId])
+}
