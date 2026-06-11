@@ -5,7 +5,7 @@ import { Test } from '@nestjs/testing';
 
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
-import { INGEST_QUEUE } from '../src/queue/queue.constants';
+import { INGEST_DLQ_QUEUE, INGEST_QUEUE } from '../src/queue/queue.constants';
 import { DidiSignatureVerifier } from '../src/webhooks/verifiers/didi.verifier';
 import { RappiSignatureVerifier } from '../src/webhooks/verifiers/rappi.verifier';
 import { SIGNATURE_VERIFIERS } from '../src/webhooks/verifiers/signature-verifier.interface';
@@ -22,6 +22,10 @@ export const buildPrismaMock = () => ({
       id: 'delivery-test-id',
       ...args.data,
     })),
+    update: jest.fn(async (args: { where: { id: string }; data: Record<string, unknown> }) => ({
+      id: args.where.id,
+      ...args.data,
+    })),
   },
 });
 
@@ -29,10 +33,24 @@ export const buildQueueMock = () => ({
   add: jest.fn(async () => ({ id: 'job-test-id' })),
 });
 
+export interface FakeDlqJob {
+  id: string;
+  data: { deliveryId: string; error: string };
+  timestamp: number;
+  remove?: () => Promise<void>;
+}
+
+export const buildDlqQueueMock = () => ({
+  add: jest.fn(async () => ({ id: 'dlq-job-test-id' })),
+  getJobs: jest.fn(async (): Promise<FakeDlqJob[]> => []),
+  getJob: jest.fn(async (): Promise<FakeDlqJob | null> => null),
+});
+
 export interface TestApp {
   app: INestApplication;
   prismaMock: ReturnType<typeof buildPrismaMock>;
   queueMock: ReturnType<typeof buildQueueMock>;
+  dlqQueueMock: ReturnType<typeof buildDlqQueueMock>;
 }
 
 /**
@@ -43,12 +61,15 @@ export interface TestApp {
 export async function buildTestApp(): Promise<TestApp> {
   const prismaMock = buildPrismaMock();
   const queueMock = buildQueueMock();
+  const dlqQueueMock = buildDlqQueueMock();
 
   const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
     .overrideProvider(PrismaService)
     .useValue(prismaMock)
     .overrideProvider(getQueueToken(INGEST_QUEUE))
     .useValue(queueMock)
+    .overrideProvider(getQueueToken(INGEST_DLQ_QUEUE))
+    .useValue(dlqQueueMock)
     // Real verifier instances with deterministic secrets: tests must not
     // depend on whatever a developer has in their local .env file.
     .overrideProvider(SIGNATURE_VERIFIERS)
@@ -62,5 +83,5 @@ export async function buildTestApp(): Promise<TestApp> {
   const app = moduleRef.createNestApplication({ rawBody: true });
   await app.init();
 
-  return { app, prismaMock, queueMock };
+  return { app, prismaMock, queueMock, dlqQueueMock };
 }
