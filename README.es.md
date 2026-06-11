@@ -51,7 +51,7 @@ pnpm test
 
 - [x] **M1** — Esqueleto del monorepo, tooling, pipeline de CI
 - [x] **M2** — Modelo canónico de pedido + máquina de estados
-- [ ] **M3** — Webhooks por proveedor con verificación de firma HMAC
+- [x] **M3** — Webhooks por proveedor con verificación de firma HMAC
 - [ ] **M4** — Adapters por proveedor + pipeline worker con BullMQ
 - [ ] **M5** — Idempotencia + dead-letter queue con endpoints de visibilidad
 - [ ] **M6** — API de pedidos + transiciones de operador
