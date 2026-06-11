@@ -10,14 +10,9 @@ import { DidiSignatureVerifier } from '../src/webhooks/verifiers/didi.verifier';
 import { RappiSignatureVerifier } from '../src/webhooks/verifiers/rappi.verifier';
 import { SIGNATURE_VERIFIERS } from '../src/webhooks/verifiers/signature-verifier.interface';
 import { UberEatsSignatureVerifier } from '../src/webhooks/verifiers/ubereats.verifier';
+import { TEST_ENV } from './test-env';
 
-export const TEST_ENV = {
-  DATABASE_URL: 'postgresql://test:test@localhost:5499/unused',
-  REDIS_URL: 'redis://localhost:6399',
-  RAPPI_WEBHOOK_SECRET: 'rappi-test-secret',
-  UBEREATS_WEBHOOK_SECRET: 'ubereats-test-secret',
-  DIDI_WEBHOOK_SECRET: 'didi-test-secret',
-};
+export { TEST_ENV };
 
 type WebhookDeliveryCreateArgs = { data: Record<string, unknown> };
 
@@ -46,8 +41,6 @@ export interface TestApp {
  * Real Postgres/Redis coverage lives in the integration suite.
  */
 export async function buildTestApp(): Promise<TestApp> {
-  Object.assign(process.env, TEST_ENV);
-
   const prismaMock = buildPrismaMock();
   const queueMock = buildQueueMock();
 
