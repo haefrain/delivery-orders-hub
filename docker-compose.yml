@@ -26,5 +26,46 @@ services:
       timeout: 3s
       retries: 10
 
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    image: delivery-orders-hub-app
+    command: sh -c "pnpm exec prisma migrate deploy && node dist/main.js"
+    environment: &app-env
+      DATABASE_URL: postgresql://hub:hub@postgres:5432/delivery_hub
+      REDIS_URL: redis://redis:6379
+      RAPPI_WEBHOOK_SECRET: local-rappi-secret
+      UBEREATS_WEBHOOK_SECRET: local-ubereats-secret
+      DIDI_WEBHOOK_SECRET: local-didi-secret
+      DASHBOARD_ORIGIN: http://localhost:8080
+    ports:
+      - '3000:3000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    image: delivery-orders-hub-app
+    command: node dist/worker.main.js
+    environment: *app-env
+    depends_on:
+      api:
+        condition: service_started
+      redis:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    ports:
+      - '8080:80'
+    depends_on:
+      api:
+        condition: service_started
+
 volumes:
   pgdata:
