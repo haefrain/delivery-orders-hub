@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { validateEnv } from './config/env.validation';
 import { DlqModule } from './dlq/dlq.module';
 import { HealthController } from './health/health.controller';
+import { OrdersModule } from './orders/orders.module';
 import { QueueModule } from './queue/queue.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 
@@ -18,6 +19,7 @@ import { WebhooksModule } from './webhooks/webhooks.module';
     QueueModule,
     WebhooksModule,
     DlqModule,
+    OrdersModule,
   ],
   controllers: [HealthController],
 })
