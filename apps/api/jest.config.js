@@ -1,0 +1,11 @@
+/** @type {import('jest').Config} */
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  roots: ['<rootDir>/src', '<rootDir>/test'],
+  testRegex: '.*\\.(spec|e2e-spec)\\.ts$',
+  moduleNameMapper: {
+    // Map the workspace package to its TS source so tests never depend on a built dist
+    '^@delivery-hub/shared$': '<rootDir>/../../packages/shared/src/index.ts',
+  },
+};
