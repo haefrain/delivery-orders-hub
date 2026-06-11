@@ -1,28 +1,21 @@
 import { afterAll, beforeAll, describe, expect, it } from '@jest/globals';
-import { INestApplication } from '@nestjs/common';
-import { Test } from '@nestjs/testing';
 import request from 'supertest';
 
-import { AppModule } from '../src/app.module';
+import { buildTestApp, TestApp } from './e2e-utils';
 
 describe('GET /health', () => {
-  let app: INestApplication;
+  let ctx: TestApp;
 
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleRef.createNestApplication({ rawBody: true });
-    await app.init();
+    ctx = await buildTestApp();
   });
 
   afterAll(async () => {
-    await app.close();
+    await ctx.app.close();
   });
 
   it('responds with status ok', async () => {
-    const response = await request(app.getHttpServer()).get('/health').expect(200);
+    const response = await request(ctx.app.getHttpServer()).get('/health').expect(200);
 
     expect(response.body.status).toBe('ok');
     expect(typeof response.body.uptime).toBe('number');

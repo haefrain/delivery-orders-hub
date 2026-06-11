@@ -1,0 +1,15 @@
+{
+  "event": "order.created",
+  "order": {
+    "id": "RAP-848271",
+    "createdAt": "2026-06-10T18:22:43-05:00",
+    "totalProducts": 3,
+    "totalOrder": 56800,
+    "products": [
+      { "name": "Hamburguesa doble", "units": 2, "price": 18900 },
+      { "name": "Limonada de coco", "units": 1, "price": 9000 },
+      { "name": "Papas medianas", "units": 1, "price": 10000 }
+    ],
+    "client": { "firstName": "Laura", "lastName": "Gómez" }
+  }
+}

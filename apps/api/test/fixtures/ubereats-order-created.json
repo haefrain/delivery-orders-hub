@@ -1,0 +1,25 @@
+{
+  "event_type": "orders.notification",
+  "event_id": "evt_4f9d2c10-77aa-4f02-9c4e-2b5f1c8d9a31",
+  "resource_href": "https://api.uber.com/v1/eats/orders/9d3a1f7e",
+  "meta": { "resource_id": "UE-77F3K2", "status": "pos", "user_id": "store-mx-014" },
+  "order": {
+    "display_id": "UE-77F3K2",
+    "placed_at": "2026-06-10T23:22:51Z",
+    "eater": { "first_name": "Carlos", "last_name": "M." },
+    "cart": {
+      "items": [
+        {
+          "title": "Tacos al pastor",
+          "quantity": 3,
+          "price": { "unit_price": { "amount": 6500, "currency_code": "MXN" } }
+        },
+        {
+          "title": "Agua de horchata",
+          "quantity": 1,
+          "price": { "unit_price": { "amount": 3000, "currency_code": "MXN" } }
+        }
+      ]
+    }
+  }
+}

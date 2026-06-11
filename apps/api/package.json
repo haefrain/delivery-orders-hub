@@ -13,10 +13,13 @@
   },
   "dependencies": {
     "@delivery-hub/shared": "workspace:*",
+    "@nestjs/bullmq": "^11.0.4",
     "@nestjs/common": "^11.0.0",
+    "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.0.0",
     "@nestjs/platform-express": "^11.0.0",
     "@prisma/client": "^6.19.3",
+    "bullmq": "^5.78.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.0"
   },
