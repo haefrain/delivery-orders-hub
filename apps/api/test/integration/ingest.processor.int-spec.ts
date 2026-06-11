@@ -10,6 +10,7 @@ import { PrismaModule } from '../../src/prisma/prisma.module';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { ProvidersModule } from '../../src/providers/providers.module';
 import { INGEST_DLQ_QUEUE } from '../../src/queue/queue.constants';
+import { DomainEventPublisher } from '../../src/realtime/domain-event-publisher';
 import didiFixture from '../fixtures/didi-order-created.json';
 import rappiFixture from '../fixtures/rappi-order-created.json';
 
@@ -25,6 +26,7 @@ describe('IngestProcessor (integration, real Postgres)', () => {
       providers: [
         IngestProcessor,
         { provide: getQueueToken(INGEST_DLQ_QUEUE), useValue: { add: jest.fn() } },
+        { provide: DomainEventPublisher, useValue: { publish: jest.fn() } },
       ],
     }).compile();
 

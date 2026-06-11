@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { OrderStatus } from '@delivery-hub/shared';
+import { OrderStatus, WS_EVENTS } from '@delivery-hub/shared';
 
+import { DomainEventPublisher } from '../realtime/domain-event-publisher';
+import { toWireOrder } from '../realtime/wire-order';
 import { OrderStateMachine } from './domain/order-state-machine';
 import { OrderRecord, OrdersRepository } from './orders.repository';
 
@@ -9,6 +11,7 @@ export class OrdersService {
   constructor(
     private readonly orders: OrdersRepository,
     private readonly stateMachine: OrderStateMachine,
+    private readonly events: DomainEventPublisher,
   ) {}
 
   list(status?: OrderStatus): Promise<OrderRecord[]> {
@@ -24,7 +27,9 @@ export class OrdersService {
     // Domain rules decide; InvalidTransitionError maps to 409 via filter
     this.stateMachine.assertTransition(order.status, to);
 
-    return this.orders.applyTransition(orderId, order.status, to, actor);
+    const updated = await this.orders.applyTransition(orderId, order.status, to, actor);
+    await this.events.publish(WS_EVENTS.ORDER_UPDATED, { order: toWireOrder(updated) });
+    return updated;
   }
 
   async metricsSummary(): Promise<{

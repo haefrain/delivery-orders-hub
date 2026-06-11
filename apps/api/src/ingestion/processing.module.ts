@@ -4,6 +4,7 @@ import { Module } from '@nestjs/common';
 import { PrismaModule } from '../prisma/prisma.module';
 import { ProvidersModule } from '../providers/providers.module';
 import { INGEST_DLQ_QUEUE, INGEST_QUEUE } from '../queue/queue.constants';
+import { EventBridgeModule } from '../realtime/event-bridge.module';
 import { IngestProcessor } from './ingest.processor';
 
 /**
@@ -17,6 +18,7 @@ import { IngestProcessor } from './ingest.processor';
   imports: [
     PrismaModule,
     ProvidersModule,
+    EventBridgeModule,
     BullModule.registerQueue({ name: INGEST_QUEUE }, { name: INGEST_DLQ_QUEUE }),
   ],
   providers: [IngestProcessor],

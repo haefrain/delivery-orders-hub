@@ -11,6 +11,7 @@ import { PrismaModule } from '../../src/prisma/prisma.module';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { ProvidersModule } from '../../src/providers/providers.module';
 import { INGEST_DLQ_QUEUE, INGEST_QUEUE } from '../../src/queue/queue.constants';
+import { DomainEventPublisher } from '../../src/realtime/domain-event-publisher';
 import rappiFixture from '../fixtures/rappi-order-created.json';
 
 describe('Idempotency and DLQ (integration, real Postgres)', () => {
@@ -28,6 +29,7 @@ describe('Idempotency and DLQ (integration, real Postgres)', () => {
         IngestProcessor,
         { provide: getQueueToken(INGEST_QUEUE), useValue: ingestQueueMock },
         { provide: getQueueToken(INGEST_DLQ_QUEUE), useValue: dlqQueueMock },
+        { provide: DomainEventPublisher, useValue: { publish: jest.fn() } },
       ],
     }).compile();
 

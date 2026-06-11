@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { PrismaModule } from '../prisma/prisma.module';
+import { EventBridgeModule } from '../realtime/event-bridge.module';
 import { OrderStateMachine } from './domain/order-state-machine';
 import { MetricsController } from './metrics.controller';
 import { OrdersController } from './orders.controller';
@@ -9,7 +10,7 @@ import { OrdersService } from './orders.service';
 import { PrismaOrdersRepository } from './prisma-orders.repository';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, EventBridgeModule],
   controllers: [OrdersController, MetricsController],
   providers: [
     OrdersService,

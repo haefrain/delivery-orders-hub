@@ -6,6 +6,8 @@ import { Test } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { INGEST_DLQ_QUEUE, INGEST_QUEUE } from '../src/queue/queue.constants';
+import { DomainEventPublisher } from '../src/realtime/domain-event-publisher';
+import { OrdersGateway } from '../src/realtime/orders.gateway';
 import { DidiSignatureVerifier } from '../src/webhooks/verifiers/didi.verifier';
 import { RappiSignatureVerifier } from '../src/webhooks/verifiers/rappi.verifier';
 import { SIGNATURE_VERIFIERS } from '../src/webhooks/verifiers/signature-verifier.interface';
@@ -70,6 +72,11 @@ export async function buildTestApp(): Promise<TestApp> {
     .useValue(queueMock)
     .overrideProvider(getQueueToken(INGEST_DLQ_QUEUE))
     .useValue(dlqQueueMock)
+    // No real Redis in HTTP-layer tests: silence the bridge and the gateway
+    .overrideProvider(DomainEventPublisher)
+    .useValue({ publish: jest.fn(async () => undefined) })
+    .overrideProvider(OrdersGateway)
+    .useValue({})
     // Real verifier instances with deterministic secrets: tests must not
     // depend on whatever a developer has in their local .env file.
     .overrideProvider(SIGNATURE_VERIFIERS)

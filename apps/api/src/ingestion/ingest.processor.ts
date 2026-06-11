@@ -1,6 +1,6 @@
 import { InjectQueue, OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
-import { OrderStatus } from '@delivery-hub/shared';
+import { OrderStatus, WS_EVENTS } from '@delivery-hub/shared';
 import { Prisma } from '@prisma/client';
 import { Job, Queue, UnrecoverableError } from 'bullmq';
 
@@ -8,6 +8,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AdapterRegistry } from '../providers/adapter.registry';
 import { InvalidProviderPayloadError } from '../providers/provider-adapter.interface';
 import { DLQ_JOB, INGEST_DLQ_QUEUE, INGEST_QUEUE } from '../queue/queue.constants';
+import { DomainEventPublisher } from '../realtime/domain-event-publisher';
+import { toWireOrder } from '../realtime/wire-order';
 
 export interface IngestJobData {
   deliveryId: string;
@@ -29,6 +31,7 @@ export class IngestProcessor extends WorkerHost {
   constructor(
     private readonly prisma: PrismaService,
     private readonly adapters: AdapterRegistry,
+    private readonly events: DomainEventPublisher,
     @InjectQueue(INGEST_DLQ_QUEUE) private readonly dlqQueue: Queue,
   ) {
     super();
@@ -49,7 +52,7 @@ export class IngestProcessor extends WorkerHost {
     try {
       const canonical = adapter.toCanonicalOrder(delivery.payload);
 
-      await this.prisma.$transaction(async (tx) => {
+      const created = await this.prisma.$transaction(async (tx) => {
         const order = await tx.order.create({
           data: {
             provider: canonical.provider,
@@ -76,7 +79,12 @@ export class IngestProcessor extends WorkerHost {
           where: { id: delivery.id },
           data: { status: 'PROCESSED', processedAt: new Date() },
         });
+
+        return order;
       });
+
+      // Published after the commit: dashboards must never see uncommitted state
+      await this.events.publish(WS_EVENTS.ORDER_CREATED, { order: toWireOrder(created) });
 
       this.logger.log(
         `Processed ${canonical.provider} order ${canonical.externalId} (delivery ${delivery.id})`,

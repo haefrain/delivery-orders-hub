@@ -6,6 +6,7 @@ import { DlqModule } from './dlq/dlq.module';
 import { HealthController } from './health/health.controller';
 import { OrdersModule } from './orders/orders.module';
 import { QueueModule } from './queue/queue.module';
+import { RealtimeModule } from './realtime/realtime.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 
 @Module({
@@ -20,6 +21,7 @@ import { WebhooksModule } from './webhooks/webhooks.module';
     WebhooksModule,
     DlqModule,
     OrdersModule,
+    RealtimeModule,
   ],
   controllers: [HealthController],
 })
