@@ -54,7 +54,7 @@ pnpm test
 - [x] **M3** — Provider webhooks with HMAC signature verification
 - [x] **M4** — Provider adapters + BullMQ worker pipeline
 - [x] **M5** — Idempotency + dead-letter queue with visibility endpoints
-- [ ] **M6** — Orders API + operator transitions
+- [x] **M6** — Orders API + operator transitions
 - [ ] **M7** — Real-time kanban dashboard
 - [ ] **M8** — Traffic simulator, full e2e suite, architecture docs & demo GIF
 
