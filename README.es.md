@@ -55,7 +55,7 @@ pnpm test
 - [x] **M4** — Adapters por proveedor + pipeline worker con BullMQ
 - [x] **M5** — Idempotencia + dead-letter queue con endpoints de visibilidad
 - [x] **M6** — API de pedidos + transiciones de operador
-- [ ] **M7** — Dashboard kanban en tiempo real
+- [x] **M7** — Dashboard kanban en tiempo real
 - [ ] **M8** — Simulador de tráfico, suite e2e completa, docs de arquitectura y GIF demo
 
 ## Licencia
